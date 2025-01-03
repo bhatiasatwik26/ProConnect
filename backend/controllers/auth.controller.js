@@ -4,11 +4,12 @@ import { generateTokenAndSetCookies, generateVerificationCode } from "../utils/v
 import { errorHandler } from "../utils/error.js";
 
 export const signUp = async (req, res, next)=>{
+    console.log("hit");
     const {username, email, password} = req.body;
     try{
         const userExist = await User.findOne({email});
         if(userExist)
-            return next(errorHandler(501, 'User already exists'));
+            return next(errorHandler(400, 'User already exists'));
         const hashPass = bcrypt.hashSync(password, 10);
         const newUser = new User({
             username,
@@ -27,9 +28,9 @@ export const signIn = async (req, res, next)=>{
     try{
         const user = await User.findOne({email});
         if(!user)
-            return next(errorHandler(501, 'User not found'));
+            return next(errorHandler(400, 'User not found'));
         if(!bcrypt.compareSync(password, user.password))
-            return next(errorHandler(501, 'Invalid password'));
+            return next(errorHandler(400, 'Invalid password'));
         generateTokenAndSetCookies(res, user._id);
         res.status(200).json({
             success: true,
